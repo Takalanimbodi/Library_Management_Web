@@ -24,3 +24,18 @@ Built with **Node.js, Express.js, MySQL**, and **plain JavaScript frontend**.
 - **Backend**: Node.js, Express.js, MySQL2, bcrypt, helmet
 - **Frontend**: HTML, CSS, JavaScript (Vanilla)
 - **Database**: MySQL
+
+## Requirements
+
+- Node.js >= 18.x
+- MySQL server
+- npm (Node Package Manager)
+
+---
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/lms.git
+cd lms  
