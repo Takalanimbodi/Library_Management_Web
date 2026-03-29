@@ -286,11 +286,11 @@ loanForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const bookId = document.getElementById("loanBookId").value;
-  const username = document.getElementById("loanUsername").value.trim();
+  const username = document.getElementById("loanUserId").value.trim();
   const loanDate = document.getElementById("loanDate").value;
   const dueDate = document.getElementById("dueDate").value;
 
-  if (!bookId || !username || !loanDate || !dueDate) {
+  if (!bookId || !userId || !loanDate || !dueDate) {
     alert("Please fill all fields correctly.");
     return;
   }
@@ -299,7 +299,7 @@ loanForm.addEventListener("submit", async (e) => {
     const res = await fetch("/api/loan-book", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId, username, loanDate, dueDate })
+      body: JSON.stringify({ bookId, userId, loanDate, dueDate })
     });
 
     const data = await res.json();
@@ -343,9 +343,9 @@ returnForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const bookId = document.getElementById("returnBookId").value;
-  const username = document.getElementById("returnUsername").value.trim();
+  const userId = document.getElementById("returnUserId").value.trim();
 
-  if (!bookId || !username) {
+  if (!bookId || !userId) {
     alert("Please fill all fields correctly.");
     return;
   }
@@ -354,7 +354,7 @@ returnForm.addEventListener("submit", async (e) => {
     const res = await fetch("/api/return-book", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId, username })
+      body: JSON.stringify({ bookId, userId })
     });
 
     const data = await res.json();
