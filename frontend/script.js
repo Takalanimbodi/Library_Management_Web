@@ -393,6 +393,12 @@ returnBookInput.addEventListener("input", async () => {
 // Pay Fine Script
 
     document.addEventListener("DOMContentLoaded", () => {
+    // At the top of your Pay Fine script, after DOMContentLoaded
+     const storedUsername = localStorage.getItem("username");
+     if (storedUsername && fineUsernameInput) {
+     fineUsernameInput.value = storedUsername;
+     fineUsernameInput.dispatchEvent(new Event("blur")); // triggers the user ID lookup
+      }
       // Get all form elements
       const payForm = document.getElementById("payForm");
       const fineUsernameInput = document.getElementById("fineUsername");
