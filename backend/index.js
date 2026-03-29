@@ -57,14 +57,12 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', (req, res) => {
   const { name, password, role } = req.body;
 
-  console.log("Login attempt:", req.body); 
-
   if (!name || !password || !role) {
     return res.status(400).json({ message: 'All fields are required.' });
   }
 
-  // Select user by name and role only
-  const sql = 'SELECT * FROM users WHERE name = ? AND role = ?';
+  // Use LOWER() on both sides to avoid case mismatch
+  const sql = 'SELECT * FROM users WHERE LOWER(name) = LOWER(?) AND LOWER(role) = LOWER(?) LIMIT 1';
   db.query(sql, [name, role], async (err, results) => {
     if (err) {
       console.error('DB error:', err);
@@ -76,15 +74,14 @@ app.post('/api/login', (req, res) => {
     }
 
     const user = results[0];
-
-    // Compare the plaintext password with the hashed password
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
       return res.status(401).json({ message: 'Invalid credentials or role.' });
     }
 
-    res.json({ message: 'Login successful', role: user.role });
+    // Return the user id so frontend can store it for fine lookups
+    res.json({ message: 'Login successful', role: user.role, userId: user.id, name: user.name });
   });
 });
 
@@ -290,7 +287,7 @@ app.post("/api/return-book", (req, res) => {
   });
 });
 
-// ----------- Pay Fine API -----------
+// Pay Fine API
 // Search user by name for Pay Fine
 app.get("/api/users", (req, res) => {
   const username = req.query.username?.trim();
