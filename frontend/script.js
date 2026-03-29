@@ -70,6 +70,8 @@ if (loginForm) {
 
       if (response.ok) {
         alert("Login successful!");
+        localStorage.setItem("userId", data.userId);  
+        localStorage.setItem("username", data.name);   
         if (data.role === "admin") {
           window.location.href = "Admin.html";
         } else if (data.role === "student") {
