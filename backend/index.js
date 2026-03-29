@@ -224,65 +224,45 @@ app.get("/api/check-book", (req, res) => {
 
 // Loan book
 app.post("/api/loan-book", (req, res) => {
-  const { bookId, username, loanDate, dueDate } = req.body;
+  const { bookId, userId, loanDate, dueDate } = req.body; 
 
-  if (!bookId || !username || !loanDate || !dueDate) {
+  if (!bookId || !userId || !loanDate || !dueDate) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  // Check if book is already on loan
   const checkLoanQuery = "SELECT id FROM loans WHERE book_id = ? AND status = 'On Loan'";
   db.query(checkLoanQuery, [bookId], (err, rows) => {
-    if (err) {
-      console.error("DB error:", err);
-      return res.status(500).json({ message: "Database error" });
-    }
+    if (err) return res.status(500).json({ message: "Database error" });
+    if (rows.length > 0) return res.status(400).json({ message: "Book is already on loan" });
 
-    if (rows.length > 0) {
-      return res.status(400).json({ message: "Book is already on loan" });
-    }
-
-    // Insert loan record
     const insertQuery = `
-      INSERT INTO loans (book_id, username, loan_date, due_date, status)
+      INSERT INTO loans (book_id, user_id, loan_date, due_date, status)
       VALUES (?, ?, ?, ?, 'On Loan')
     `;
-    db.query(insertQuery, [bookId, username, loanDate, dueDate], (err2, result2) => {
-      if (err2) {
-        console.error("DB error:", err2);
-        return res.status(500).json({ message: "Error inserting loan" });
-      }
-
+    db.query(insertQuery, [bookId, userId, loanDate, dueDate], (err2, result) => {
+      if (err2) return res.status(500).json({ message: "Error inserting loan" });
       res.json({ message: "Book loaned successfully", loanId: result2.insertId });
     });
   });
 });
 
-
-//  Return book
+// Return book route
 app.post("/api/return-book", (req, res) => {
-  const { bookId, username } = req.body;
+  const { bookId, userId } = req.body;
 
-  if (!bookId || !username) {
+  if (!bookId || !userId) {
     return res.status(400).json({ message: "Missing fields" });
   }
 
   const updateQuery = `
-    UPDATE loans 
-    SET status = 'Returned' 
-    WHERE book_id = ? AND username = ? AND status = 'On Loan'
+    UPDATE loans SET status = 'Returned'
+    WHERE book_id = ? AND user_id = ? AND status = 'On Loan'
   `;
-
-  db.query(updateQuery, [bookId, username], (err, result) => {
-    if (err) {
-      console.error("DB error:", err);
-      return res.status(500).json({ message: "Database error" });
-    }
-
+  db.query(updateQuery, [bookId, userId], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error" });
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "No active loan found for this book/user" });
+      return res.status(404).json({ message: "No active loan found" });
     }
-
     res.json({ message: "Book returned successfully!" });
   });
 });
